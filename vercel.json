@@ -1,7 +1,7 @@
 {
     "functions": {
       "pages/api/chat.js": {
-        "memory": 1700,
+        "memory": 1024,
         "maxDuration": 120
       }
     }
