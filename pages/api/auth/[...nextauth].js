@@ -44,4 +44,8 @@ export default NextAuth({
     },
   },
   debug: process.env.NODE_ENV === "development", // Enable debug logs in development
+  basePath:
+    process.env.NODE_ENV === "production"
+      ? "https://travel-agent-roan.vercel.app/"
+      : "http://localhost:3000",
 });
