@@ -21,7 +21,8 @@
     "react": "latest",
     "react-dom": "latest",
     "react-markdown": "^9.0.1",
-    "remark-gfm": "^4.0.0"
+    "remark-gfm": "^4.0.0",
+    "semver": "^7.6.3"
   },
   "devDependencies": {
     "autoprefixer": "latest",
