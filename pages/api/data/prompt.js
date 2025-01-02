@@ -72,7 +72,46 @@ const system_prompt = (data) => {
       Ensure that all interactions reflect the hospitality and friendly nature typical of Sri Lankan culture.
       
       username: ${data}
+
+      add emojis an show beauty chat
+
     `;
 };
+// const travel_plan_prompt = ```
+// Build a detailed day-by-day itinerary for a {duration}-day trip based on the following details:
 
+// User Data:
+
+// When (Dates & Month): {when}
+// Who (Traveler Type & Count):
+// Adults: {adult_count}
+// Children: {children_count}
+// Infants: {infants_count}
+// Pets: {pets_count}
+// Budget: {budget} (Options: On a Budget, Sensibly Priced, Upscale, Luxury)
+// Travel Vibe: {travel_vibe} (Options: Cultural Exploration, Adventure & Outdoor Activities, Relaxation & Wellness, Romantic Getaway, Family-Friendly, Solo Exploration, Nature Retreat, Food & Culinary Tour, Thrill-Seeking, Spiritual Journey)
+// Preferred Destination Type: {destination_type} (e.g., beach, mountains, city, countryside)
+// Accommodation Preference: {accommodation} (e.g., hotel, resort, Airbnb, camping)
+// Transportation Preference: {transportation} (e.g., flights, road trip, train)
+// Special Interests/Activities: {interests} (e.g., historical sites, festivals, nightlife, wildlife)
+// Dietary Requirements or Preferences: {dietary}
+// Desired Duration of Stay: {duration} days
+// Flexibility: {flexibility} (Strict or Open to Suggestions)
+// Itinerary Structure:
+
+// Title each day with a theme that aligns with the travel vibe (e.g., "Cultural Discovery Day" or "Adventure in the Mountains").
+// Suggest morning, afternoon, and evening activities for each day.
+// Recommend specific hotels or accommodations that fit the budget and preferences.
+// Include dining options (breakfast, lunch, and dinner), with suggestions for local restaurants that fit dietary needs.
+// Suggest local events, attractions, and hidden gems based on special interests.
+// Incorporate rest or flexible days if needed.
+// Highlight must-know travel tips, transportation details, and safety recommendations.
+// Extra Request:
+
+// Include alternative suggestions for unpredictable weather or closed attractions.
+// Suggest optional day trips or nearby places to explore.
+// Add insider tips or unique local experiences to enhance the trip.
+// Ensure the plan feels immersive, practical, and well-structured, while keeping it highly engaging and easy to follow.
+
+// ```;
 export { system_prompt };

@@ -1,36 +1,45 @@
 import React from 'react'
-import { NotebookTabs, Flower, MessageCircleMore,Castle,Coins,NotebookPen,BadgePlus } from 'lucide-react'
+import { NotebookTabs, Activity, MessageCircleMore, Compass, MapPin, BookHeart } from 'lucide-react'
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+
 function LeftNav() {
+    const router = useRouter();
+    const currentRoute = router.asPath;
+    // alert(currentRoute)
     return (
-        <div className="left bg-spice-red w-[20%] shadow-2xl drop-shadow-lg text-coconut-white">
-            <div className="content px-8 py-4 font-body2">
-                <h1 className='text-xl font-header2 font-semibold'>Explore Island</h1>
-                <div className='flex flex-col space-y-1 py-4 font-header2'>
-                    <h3 className='text-lg'>Quick Actions</h3>
-                    <ul className='flex flex-col space-y-4 py-4'>
+        <div className="left bg-white w-[18%] border-r-2">
+            <div className="content px-4 py-4 font-body2">
+                <h1 className='text-xl font-header2 px-4 font-semibold'>SEANDIPAI</h1>
 
-                       
-                        <li className='inline-flex space-x-2'><NotebookPen color="#ffffff" /><p>Creat plan</p></li>
-                        
-                 
-                        <li className='inline-flex space-x-2'><BadgePlus color="#ffffff" /><p>Add Experiences</p></li>
-                        <li className='inline-flex space-x-2'><Coins color="#ffffff" /><p>Currency exchange</p></li>
-                    </ul>
-                </div>
-                <div className='flex flex-col space-y-1 py-4 font-header2'>
-                    <h3 className='text-lg'>Feture</h3>
-                    <ul className='flex flex-col space-y-4 py-4'>
+                <div className='flex flex-col space-y-1 py-4  transition'>
 
-                        <li className='inline-flex space-x-2'><MessageCircleMore color="#ffffff" /><p>Chat</p></li>
-                        <li className='inline-flex space-x-2'><NotebookTabs color="#ffffff" /><p>My Plans</p></li>
-                        <li className='inline-flex space-x-2'><Castle color="#ffffff" /><p>Top Places</p></li>
-                 
-                        <li className='inline-flex space-x-2'><Flower color="#ffffff" /><p>Others Experiences</p></li>
-                        <li className='inline-flex space-x-2'><Coins color="#ffffff" /><p>Currency exchange</p></li>
+                    <ul className='flex cursor-pointer flex-col space-y-2 py-4'>
+                        <Link href='/app/chat' className={currentRoute === '/app/chat' ? 'inline-flex space-x-2 text-black py-2 px-4 rounded-md' : 'inline-flex space-x-2 text-gray-900 py-2 px-4 rounded-md'}>
+                            <MessageCircleMore fill={currentRoute === '/app/chat' ? '#000' : 'transparent'} />
+                            <p>Chat</p>
+                        </Link>
+
+                        <Link href='/app/explore' className={currentRoute === '/app/explore' ? 'inline-flex space-x-2 text-black py-2 px-4 rounded-md' : 'inline-flex space-x-2 text-gray-900 py-2 px-4 rounded-md'}>
+                            <MapPin fill={currentRoute === '/app/explore' ? '#000' : 'transparent'} />
+                            <p>Explore</p>
+                        </Link>
+
+                        <Link href='/app/trips' className={currentRoute === '/app/trips' ? 'inline-flex space-x-2 text-black py-2 px-4 rounded-md' : 'inline-flex space-x-2 text-gray-900 py-2 px-4 rounded-md'}>
+                            <Compass fill={currentRoute === '/app/trips' ? '#000' : 'transparent'} />
+                            <p>Easy Trips</p>
+                        </Link>
+
+                        <Link href='/app/activity' className={currentRoute === '/app/activity' ? 'inline-flex space-x-2 text-black py-2 px-4 rounded-md' : 'inline-flex space-x-2 text-gray-900 py-2 px-4 rounded-md'}>
+                            <BookHeart fill={currentRoute === '/app/activity' ? '#000' : 'transparent'} />
+                            <p>Activity</p>
+                        </Link>
+
+
                     </ul>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 
