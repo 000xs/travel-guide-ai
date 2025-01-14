@@ -51,7 +51,7 @@ export default function Home() {
           </ul>
           {!session ? (
             <Link href={"/app/chat"}>
-              <div className="cta bg-white text-black rounded-full px-4 py-2">Get's Start</div>
+              <div className="cta bg-white text-black rounded-full px-4 py-2">Get&apos;s Start</div>
 
             </Link>
           ) : (
@@ -200,7 +200,7 @@ export default function Home() {
                 </div>
               </div>
               <p class="text-gray-600">
-                "This AI travel planner made my Sri Lanka trip unforgettable! It saved me so much time and effort."
+              &quot;This AI travel planner made my Sri Lanka trip unforgettable! It saved me so much time and effort.&quot;
               </p>
             </div>
 
@@ -219,7 +219,7 @@ export default function Home() {
                 </div>
               </div>
               <p class="text-gray-600">
-                "The travel guide was incredibly helpful. I discovered places I never would have found on my own."
+              &quot;The travel guide was incredibly helpful. I discovered places I never would have found on my own.&quot;
               </p>
             </div>
           </div>
@@ -238,9 +238,9 @@ export default function Home() {
             Sign up now and let our AI travel planner create the perfect itinerary for your Sri Lanka adventure!
           </p>
 
-          <a href="/app/chat" class="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-300">
+          <Link href="/app/chat" class="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-300">
             Get Started
-          </a>
+          </Link>
         </div>
       </section>
       <footer class="bg-gray-800 text-white py-12">
