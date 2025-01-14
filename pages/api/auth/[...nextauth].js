@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import FacebookProvider from "next-auth/providers/facebook";
-import AppleProvider from "next-auth/providers/apple";
+import GitHubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
 
@@ -11,27 +10,25 @@ export const authOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
-    // FacebookProvider({
-    //   clientId: process.env.FACEBOOK_CLIENT_ID,
-    //   clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    // }),
-    // AppleProvider({
-    //   clientId: process.env.APPLE_CLIENT_ID,
-    //   clientSecret: process.env.APPLE_CLIENT_SECRET,
+    // GitHubProvider({
+    //   clientId: process.env.GITHUB_CLIENT_ID,
+    //   clientSecret: process.env.GITHUB_CLIENT_SECRET,
     // }),
   ],
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    strategy: "jwt", 
+    maxAge: 30 * 24 * 60 * 60, 
   },
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, profile }) {
+       
+
       if (account && user) {
         token.accessToken = account.access_token;
         token.userId = user.id;
@@ -39,6 +36,7 @@ export const authOptions = {
       return token;
     },
     async session({ session, token }) {
+       
       if (session?.user && token) {
         session.user.id = token.userId;
         session.accessToken = token.accessToken;
@@ -46,8 +44,23 @@ export const authOptions = {
       return session;
     },
   },
-  debug: process.env.NODE_ENV === "development",
-  
+  debug: true,
+  logger: {
+    error: (code, ...message) => console.error(code, ...message),
+    warn: (code, ...message) => console.warn(code, ...message),
+    debug: (code, ...message) => console.debug(code, ...message),
+  },
+  events: {
+    async signIn(message) {
+      console.log("SignIn event:", message);
+    },
+    async session(message) {
+      console.log("Session event:", message);
+    },
+    async signOut(message) {
+      console.log("SignOut event:", message);
+    },
+  },
 };
 
 export default NextAuth(authOptions);
