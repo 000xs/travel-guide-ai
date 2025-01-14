@@ -6,14 +6,15 @@ import Head from 'next/head';
 import Link from 'next/link';
 import LeftNav from '@/Components/LeftNav';
 import ChatMessages from '@/Components/ChatMessage';
-import FeatureCard from '@/Components/FeatureCard';
+
 import { useRouter } from 'next/router';
-import DateRangePicker from '@/Components/DateRangePicker';
 
-import TravelerSelector from '@/Components/TravelerSelector';
-
-import BudgetSlider from '@/Components/BudgetSlider';
-import VibeSelector from '@/Components/VibeSelector';
+import TripForm from '@/Components/ui/forms/TripForm';
+import { travel_plan_prompt } from '@/pages/api/data/prompt';
+import { itineraryTextToJson, parseItineraryToJSON } from '@/utils/parseItinerary';
+import { chatAPI, planAPI } from '@/utils/api-client';
+import TripItineraryMap from '@/Components/ui/TripItineraryMap';
+import ChatTopNav from '@/Components/ui/ChatTopNav';
 
 
 
@@ -27,77 +28,126 @@ const Chat = () => {
     const [threadId, setThreadId] = useState(null);
     const [typingMessage, setTypingMessage] = useState('');
     const [isThinking, setIsThinking] = useState(false);
-    const baseUrl = "/api";
+
+    const [isLoding, setIsLoding] = useState(false);
+    const [plan, setPlan] = useState(null);
 
     useEffect(() => {
+        console.log(session);
         const savedThreadId = localStorage.getItem("a_thread_id");
         if (savedThreadId) {
             setThreadId(savedThreadId);
         }
-    }, []);
+        if (chatId && chatId !== "new") {
+            setThreadId(chatId);
 
-    const [dateRange, setDateRange] = useState('Select Date Range');
+            getPlan(chatId).then((data) => {
+                setPlan(data[0]);
+                setIsLoding(false);
+            });
+        } else {
+            setIsLoding(false);
+        }
+    }, [chatId, session]);
 
-    const handleDateRangeChange = (range) => {
-        setDateRange(range); // Update the date range in the parent state
-        // alert(range);
-    };
+    async function getPlan(id) {
+        try {
+            setIsLoding(true)
+            const res = await planAPI.getPlanById(id);
+            console.log("Plan data:", res.data);
+            if (res.status === 200) {
+                return res.data;
+            } else {
+                console.error("Failed to fetch plan:", res.data);
+                router.push("/app/chat");
+            }
 
-    const handleTravelerInfoSubmit = (info) => {
-        console.log('Traveler Info Submitted:', info);
-    };
 
-    const [budgetValue, setBudgetValue] = useState(1);
-    const handleBudgetChange = (value) => {
-        setBudgetValue(value);
-        console.log("Selected Budget Level:", value);
-    };
+        } catch (error) {
+            console.error("Error fetching plan:", error);
 
-    const [selectedVibes, setSelectedVibes] = useState([]);
-    const handleVibeSelection = (vibes) => {
-        setSelectedVibes(vibes);
+            return error;
+        }
+    }
 
-        console.log("Selected vibes: ", vibes);
-    };
+    const [formData, setFormData] = useState({});
+    const formOnSubmit = async (data) => {
+        setFormData(data)
+
+        setIsThinking(true);
+
+        const newMessage = { text: travel_plan_prompt(data), sender: 'user' };
+        setMessages([...messages, newMessage]);
+        setInput('');
+
+
+        try {
+
+            const response = await chatAPI.sendMessage(travel_plan_prompt(data), threadId);
+            console.log(session)
+            setIsThinking(false);
+
+            const budgetOptions = [
+                "$ - Affordable options",
+                "$$ - Reasonable, sensibly priced",
+                "$$$ - Upscale experience",
+                "$$$$ - Luxury experience",
+            ];
+
+            // Get the budget description based on the selected budget value
+            const budgetDescription = budgetOptions[data.budgetValue - 1];
+            const travelVibes = data.selectedVibes.join(", ");
+
+            //createplan
+            const planData = {
+                prompt: response.data.response,
+                startDate: new Date(data.dateRange.startDate),
+                endDate: new Date(data.dateRange.endDate),
+                budget: budgetDescription,
+                travelers: { adults: data.travelers.adults, children: data.travelers.children, infants: data.travelers.infants, pets: data.travelers.pets },
+                selectedViber: data.selectedVibes,
+
+            }
+            const responsePlan = await planAPI.createPlan(planData)
+            setIsLoding(true)
+
+            if (responsePlan.data.thread) {
+                setIsThinking(false);
+                simulateTyping(response.data.response)
+                router.replace(`/app/chat/${responsePlan.data.thread.id}`);
+                localStorage.setItem("a_thread_id", responsePlan.data.thread.id);
+            } else {
+                console.error("Failed to create plan:", responsePlan.data);
+
+            }
+            console.log(responsePlan.data)
+
+
+                ;
+        } catch (error) {
+            setMessages(prev => [...prev, {
+                text: 'Error: ' + error.message,
+                sender: 'error'
+            }]);
+            setIsThinking(false);
+        }
+
+    }
+
+
+
 
     const Aside = ({ chat }) => (
+
         <aside className="hidden lg:block w-[40%] border-l bg-white px-6 py-3 overflow-y-auto">
             {chat === 'new' ? (
-                <div>
-                    <h2 className="text-xl py-4 font-body2 font-semibold">Create a Trip</h2>
-                    <div >
-                        <div className="flex flex-col space-y-2">
-                            <div className='flex flex-col space-y-1'>
-                                <label className=' text-md font-body font-normal'>Destination</label>
-                                <input type="text" className='p-3 border border-gray-300 rounded-md w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500'
-                                    placeholder='Enter Destination' />
-                            </div>
-                            <div className='flex flex-col space-y-1'>
-                                <label className=' text-md font-body font-normal'>Travel Dates</label>
-                                <DateRangePicker onDateRangeChange={handleDateRangeChange} />
-                            </div>
-                            <div className='flex flex-col space-y-1'>
-                                <label className=' text-md font-body font-normal'>Number of Travelers</label>
-                                {/* <DateRangePicker onDateRangeChange={handleDateRangeChange} /> */}
-                                <TravelerSelector onTravelerInfoSubmit={handleTravelerInfoSubmit} />
-                            </div>
-                            <div className='flex flex-col space-y-1'>
-                                <label className=' text-md font-body font-normal'>Estimated Cost</label>
-                                <BudgetSlider onBudgetChange={handleBudgetChange} />
-                            </div>
-                            <div className='flex flex-col space-y-1'>
-                                <label className=' text-md font-body font-normal'>Your Vibe</label>
-                                <VibeSelector onVibeSelection={handleVibeSelection} />
-                            </div>
-                            <button
-                                className='w-full text-white bg-spice-red p-3 font-body font-normal border border-gray-300 rounded-md  cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500s'
-                            >Create a Plan</button>
-                        </div>
-                    </div>
-
-                </div>
+                <TripForm onFormSubmit={formOnSubmit} />
             ) : (
-                <div>create</div>
+                <div>
+                    {plan && (
+                        <TripItineraryMap data={plan} />
+                    )}
+                </div>
             )}
 
 
@@ -114,13 +164,16 @@ const Chat = () => {
         setInput('');
 
         try {
-            const response = await axios.post(
-                `${baseUrl}/chat`,
-                { thread_id: threadId, message: input },
-                { headers: { Authorization: `Bearer ${session}` } }
-            );
+            const response = await chatAPI.sendMessage(input, threadId);
+
+
             setIsThinking(false);
+            console.log(session)
+            console.log(response.data)
+
+
             simulateTyping(response.data.response);
+
         } catch (error) {
             setMessages(prev => [...prev, {
                 text: 'Error: ' + error.message,
@@ -132,21 +185,25 @@ const Chat = () => {
 
     const simulateTyping = (text) => {
         let index = 0;
-        setTypingMessage('');
+        const limitedText = text.slice(0, 20); // Limit to the first 20 characters
+        setTypingMessage(''); // Clear any previous typing message
 
         const interval = setInterval(() => {
-            if (index < text.length) {
-                setTypingMessage(prev => prev + text[index]);
+            if (index < limitedText.length) {
+                setTypingMessage(prev => prev + limitedText[index]); // Simulate typing
                 index++;
             } else {
-                clearInterval(interval);
-                setMessages(prev => [...prev, { text, sender: 'bot' }]);
-                setTypingMessage('');
+                clearInterval(interval); // Stop typing effect after 20 characters
+                setTimeout(() => {
+                    setTypingMessage(''); // Clear typing message
+                    setMessages(prev => [...prev, { text, sender: 'bot' }]); // Add full message to chat
+                }, 1); // Optional delay before showing the full message
             }
-        }, 30);
+        }, 1);
     };
 
-    if (status === "loading") {
+
+    if (status === "loading" || isLoding) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-red-500" />
@@ -175,18 +232,7 @@ const Chat = () => {
 
 
             <div className="flex-1 flex flex-col">
-                <header className="bg-white px-6 py-4 shadow-sm">
-                    <div className="flex justify-between items-center max-w-7xl mx-auto">
-                        <h1 className="text-xl font-semibold text-gray-800">SerandipAI Travel Assistant</h1>
-                        {/* {session.user?.image && (
-                            <img
-                                src={session.user.image}
-                                alt="Profile"
-                                className="w-10 h-10 rounded-full border-2 border-gray-200"
-                            />
-                        )} */}
-                    </div>
-                </header>
+                {plan && (<ChatTopNav chats={plan.tripName} />)}
 
                 <main className="flex-1 flex overflow-hidden bg-white">
                     <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full">
@@ -199,8 +245,15 @@ const Chat = () => {
                             />
                         </div>
 
+
                         <div className="p-4   bg-white">
+                            {isThinking && (
+                                <div className='w-full px-1 py-2 font-body2 font-semibold'>
+                                    bot is thinking...
+                                </div>
+                            )}
                             <div className="flex items-center bg-white border border-gray-300 rounded-xl shadow-md px-8 py-4">
+
                                 <textarea
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
@@ -219,6 +272,7 @@ const Chat = () => {
                             </div>
                         </div>
                     </div>
+                    {/* <TripForm chat={chatId} /> */}
 
                     <Aside chat={chatId} />
                 </main>
@@ -228,3 +282,4 @@ const Chat = () => {
 };
 
 export default Chat;
+

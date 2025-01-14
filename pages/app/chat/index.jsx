@@ -6,9 +6,12 @@ import Head from 'next/head';
 import Link from 'next/link';
 import LeftNav from '@/Components/LeftNav';
 import ChatMessages from '@/Components/ChatMessage';
-import FeatureCard from '@/Components/FeatureCard';
+import FeatureCard from '@/Components/ui/cards/FeatureCard';
+import { useRouter } from 'next/navigation';
+import { chatAPI, planAPI } from '@/utils/api-client';
 
 const Chat = () => {
+    const router = useRouter();
     const { data: session, status } = useSession();
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
@@ -16,67 +19,42 @@ const Chat = () => {
     const [typingMessage, setTypingMessage] = useState('');
     const [isThinking, setIsThinking] = useState(false);
     const baseUrl = "/api";
+    const [isLoding, setIsLoding] = useState(false);
+    const [plans, setPlan] = useState([]);
 
     useEffect(() => {
         const savedThreadId = localStorage.getItem("a_thread_id");
         if (savedThreadId) {
             setThreadId(savedThreadId);
         }
+        getPlans().then((data) => {
+            setPlan(data);
+            setIsLoding(false);
+        })
     }, []);
 
-    const QuickActionButton = ({ icon: Icon, text, onClick }) => (
-        <button
-            onClick={onClick}
-            className="flex items-center space-x-1 bg-red-500 text-coconut-white px-3 py-2 rounded-md text-sm hover:bg-red-600 transition-colors"
-        >
-            <Icon size={16} color="#fff" />
-            <span>{text}</span>
-        </button>
-    );
+    async function getPlans() {
+        try {
+            setIsLoding(true);
+            const res = await planAPI.getPlan();
 
-    const CurrencyWidget = () => (
-        <div className="bg-white p-4 rounded-lg shadow-md space-y-4 max-w-sm">
-            <div>
-                <label className="block text-sm font-semibold mb-1">Amount</label>
-                <input
-                    type="number"
-                    placeholder="Amount"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                />
-            </div>
-            <div className="flex items-center space-x-4">
-                <div className="flex-1">
-                    <label className="block text-sm font-semibold mb-1">From</label>
-                    <select className="w-full p-2 border border-gray-300 rounded-md">
-                        <option value="LKR">LKR</option>
-                        <option value="USD">USD</option>
-                    </select>
-                </div>
-                <div className="flex items-center self-end pb-1">
-                    <ArrowLeftRight className="text-gray-500" />
-                </div>
-                <div className="flex-1">
-                    <label className="block text-sm font-semibold mb-1">To</label>
-                    <select className="w-full p-2 border border-gray-300 rounded-md">
-                        <option value="LKR">LKR</option>
-                        <option value="USD">USD</option>
-                    </select>
-                </div>
-            </div>
-            <button className="w-full p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
-                Convert
-            </button>
-        </div>
-    );
+            console.log("Plan data:", res.data);
 
-    const currency = () => {
-        const newMessage = {
-            text: "Change currency to LKR",
-            sender: 'bot',
-            widget: <CurrencyWidget />
-        };
-        setMessages([...messages, newMessage]);
-    };
+            if (res.status === 200) {
+                return res.data; // Return the fetched data (already an array)
+            } else {
+                console.error("Failed to fetch plan:", res.data);
+                router.push("/app/chat"); // Redirect on failure
+                return []; // Return an empty array to avoid setting invalid data
+            }
+        } catch (error) {
+            console.error("Error fetching plan:", error);
+
+            return []; // Return an empty array to avoid setting invalid data
+        } finally {
+            setIsLoding(false); // Ensure loading state is reset
+        }
+    }
 
     const sendMessage = async () => {
         if (!input.trim()) return;
@@ -87,11 +65,8 @@ const Chat = () => {
         setInput('');
 
         try {
-            const response = await axios.post(
-                `${baseUrl}/chat`,
-                { thread_id: threadId, message: input },
-                { headers: { Authorization: `Bearer ${session}` } }
-            );
+
+            const response = await chatAPI.sendMessage(input, threadId);
             setIsThinking(false);
             simulateTyping(response.data.response);
         } catch (error) {
@@ -116,10 +91,10 @@ const Chat = () => {
                 setMessages(prev => [...prev, { text, sender: 'bot' }]);
                 setTypingMessage('');
             }
-        }, 30);
+        }, 1);
     };
 
-    if (status === "loading") {
+    if (status === "loading" || isLoding) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-red-500" />
@@ -150,14 +125,42 @@ const Chat = () => {
             <div className="flex-1 flex flex-col">
                 <header className="bg-white px-6 py-4 shadow-sm">
                     <div className="flex justify-between items-center max-w-7xl mx-auto">
-                        <h1 className="text-xl font-semibold text-gray-800">SerandipAI Travel Assistant</h1>
-                        {/* {session.user?.image && (
-                            <img
-                                src={session.user.image}
-                                alt="Profile"
-                                className="w-10 h-10 rounded-full border-2 border-gray-200"
-                            />
-                        )} */}
+                        <div className="relative inline-block text-left">
+                            <details className="group">
+                                <summary className="inline-flex justify-center items-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
+                                    SerandipAI Travel Assistant
+                                    <svg
+                                        className="w-5 h-5 ml-2 -mr-1 text-gray-400 group-open:rotate-180"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                </summary>
+                                <div className="absolute right-0 mt-2 w-56 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                    <div className="py-1">
+                                        {plans.map((plan) => (
+                                            <Link key={plan.id}
+                                            className='flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+                                            href={`/app/chat/${plan.thread.id}`}> {plan.tripName}</Link>
+
+                                            // <div key={plan.id} className="flex items-center space-x-2 p-2">
+                                            //     <ArrowLeftRight className="w-5 h-5" />
+                                            //     <p className="text-sm font-semibold">Plan: {plan.tripName}</p>
+                                            //     <p className="text-sm text-gray-500">Thread: {plan.thread.name}</p>
+                                            // </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+
                     </div>
                 </header>
 
@@ -223,11 +226,20 @@ const Chat = () => {
                         <div>
                             <div className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50">
                                 <div className="flex-shrink-0">
-                                    
+
                                 </div>
-                                <div>
-                                    <h3 className="font-medium text-gray-900">Create Plan</h3>
-                                    <p className="text-sm text-gray-500">create a trip plan</p>
+                                <div
+                                    style={{
+                                        backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.3)), url('/card.webp')`,
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center'
+                                    }}
+                                    onClick={() => router.push('/app/chat/new')}
+
+                                    className="  bg-cover hover:shadow-sm hover:scale-105 transition-transform duration-300 hover:shadow-gray-500 hover:cursor-pointer bg-center rounded-lg w-full px-8 py-8 font-body"
+                                >
+                                    <h3 className="font-semibold text-white text-2xl">Create Plan</h3>
+                                    <p className="text-sm font-body2 text-gray-200">create a trip plan in Sri Lanka!</p>
                                 </div>
                             </div>
                         </div>

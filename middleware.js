@@ -1,27 +1,58 @@
-// middleware.js (or middleware.ts for TypeScript)
+import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
 
-import { NextResponse } from 'next/server';
+const secret = process.env.NEXTAUTH_SECRET;
 
 export async function middleware(req) {
-  const authHeader = req.headers.get('authorization');
+  console.log("Middleware executing for path:", req.nextUrl.pathname);
 
-  // If no Authorization header or invalid format
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return NextResponse.json({ message: 'Unauthorized: No token provided' }, { status: 401 });
+  try {
+    const token = await getToken({
+      req,
+      secret,
+      secureCookie: process.env.NODE_ENV === "production",
+      raw: false,
+    });
+
+    console.log("Token in middleware:", !!token);
+
+
+    if (req.nextUrl.pathname.startsWith("/api/")) {
+      if (!token) {
+        console.log("No token found for API route");
+        return NextResponse.json(
+          { message: "Unauthorized: No token provided" },
+          { status: 401 }
+        );
+      }
+
+
+      const requestHeaders = new Headers(req.headers);
+      requestHeaders.set("x-user-token", JSON.stringify(token));
+
+      console.log("Added x-user-token to headers for:", req.nextUrl.pathname);
+
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      });
+    }
+
+    return NextResponse.next();
+  } catch (error) {
+    console.error("Middleware error:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
-
-  const token = authHeader.split(' ')[1];
-  console.log(token.data)
-
-//   // Replace this with your token validation logic (e.g., JWT validation)
-//   if (token !== 'your-secret-token') {
-//     return NextResponse.json({ message: 'Forbidden: Invalid token' }, { status: 403 });
-//   }
-
-  // If the token is valid, allow the request to proceed
-  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/api/chat'], // Apply this middleware only to specific routes
+  matcher: [
+    "/api/chat",
+    "/api/plan", // Ensure /api/plan is included
+    // Add other protected routes here
+  ],
 };

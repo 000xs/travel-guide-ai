@@ -10,12 +10,12 @@ function LeftNav() {
     return (
         <div className="left bg-white w-[18%] border-r-2">
             <div className="content px-4 py-4 font-body2">
-                <h1 className='text-xl font-header2 px-4 font-semibold'>SEANDIPAI</h1>
+                <h1 className='text-xl font-header2 px-4 font-semibold'>SerandipAI</h1>
 
                 <div className='flex flex-col space-y-1 py-4  transition'>
 
                     <ul className='flex cursor-pointer flex-col space-y-2 py-4'>
-                        <Link href='/app/chat' className={currentRoute === '/app/chat' ? 'inline-flex space-x-2 text-black py-2 px-4 rounded-md' : 'inline-flex space-x-2 text-gray-900 py-2 px-4 rounded-md'}>
+                        <Link href='/app/chat' className={currentRoute === '/app/chat' || currentRoute === '/app/chat/new'|| currentRoute.startsWith('/app/chat/') ? 'inline-flex space-x-2 text-black py-2 px-4 rounded-md' : 'inline-flex space-x-2 text-gray-900 py-2 px-4 rounded-md'}>
                             <MessageCircleMore fill={currentRoute === '/app/chat' ? '#000' : 'transparent'} />
                             <p>Chat</p>
                         </Link>

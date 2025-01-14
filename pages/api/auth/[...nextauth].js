@@ -1,51 +1,53 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
+import FacebookProvider from "next-auth/providers/facebook";
+import AppleProvider from "next-auth/providers/apple";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
 
-export default NextAuth({
+export const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      httpOptions: {
-        timeout: 10000, // Increase timeout to 10 seconds to avoid callback errors
-      },
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    }),
+    AppleProvider({
+      clientId: process.env.APPLE_CLIENT_ID,
+      clientSecret: process.env.APPLE_CLIENT_SECRET,
     }),
   ],
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   pages: {
     signIn: "/auth/signin",
+    error: "/auth/error",
   },
   callbacks: {
-    async session({ session, user }) {
-      if (session?.user && user) {
-        session.user.id = user.id;
-        session.user.email = user.email;
+    async jwt({ token, user, account }) {
+      if (account && user) {
+        token.accessToken = account.access_token;
+        token.userId = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session?.user && token) {
+        session.user.id = token.userId;
+        session.accessToken = token.accessToken;
       }
       return session;
     },
-
-    async signIn({ account, profile }) {
-      if (account?.provider === "github") {
-        console.log("GitHub sign-in attempt:", profile);
-      }
-      return true;
-    },
-    async error(error) {
-      console.error("NextAuth error:", error);
-      return error;
-    },
   },
-  debug: process.env.NODE_ENV === "development", // Enable debug logs in development
-  basePath:
-    process.env.NODE_ENV === "production"
-      ? "https://travel-agent-roan.vercel.app/"
-      : "http://localhost:3000",
-});
+  debug: process.env.NODE_ENV === "development",
+  
+};
+
+export default NextAuth(authOptions);

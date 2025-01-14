@@ -1,0 +1,114 @@
+{
+  "places": [
+    {
+      "id": "place_1321",
+      "type": "restaurant",
+      "name": "Delicious Spot",
+      "overview": "A small but cozy restaurant with great local cuisine.",
+      "images": ["https://example.com/images/dining1.jpg"],
+      "location": {
+        "address": {
+          "road": "1 Ppx Road",
+          "city": "Ella",
+          "postalCode": "90100"
+        },
+        "landmark": "Near the big board",
+        "googleBusiness": "https://g.page/delicious-spot"
+      },
+      "contact": {
+        "phone": 1283943,
+        "email": "contact@deliciousspot.com",
+        "website": "https://deliciousspot.com"
+      },
+      "reviewRating": 4.5
+    },
+    {
+      "id": "place_1322",
+      "type": "hotel",
+      "name": "Mountain View Hotel",
+      "overview": "Luxurious hotel with stunning mountain views.",
+      "images": ["https://example.com/images/stay1.jpg"],
+      "location": {
+        "address": {
+          "road": "Highland Avenue",
+          "city": "Nuwara Eliya",
+          "postalCode": "22200"
+        },
+        "landmark": "Next to Tea Plantation",
+        "googleBusiness": "https://g.page/mountain-view-hotel"
+      },
+      "contact": {
+        "phone": 1234567,
+        "email": "info@mountainview.com",
+        "website": "https://mountainview.com"
+      },
+      "reviewRating": 4.8
+    },
+    {
+      "id": "place_1323",
+      "type": "adventure",
+      "name": "Waterfall Trekking",
+      "overview": "Adventure-filled trekking experience to hidden waterfalls.",
+      "images": ["https://example.com/images/adventure1.jpg"],
+      "location": {
+        "address": {
+          "road": "Forest Trail",
+          "city": "Kandy",
+          "postalCode": "20000"
+        },
+        "landmark": "Near Forest Reserve",
+        "googleBusiness": "https://g.page/waterfall-trek"
+      },
+      "contact": {
+        "phone": 9876543,
+        "email": "adventures@trekking.com",
+        "website": "https://trekkingadventures.com"
+      },
+      "reviewRating": 4.7
+    },
+    {
+      "id": "place_1324",
+      "type": "tour",
+      "name": "Ella Local Guide Tours",
+      "overview": "Expert-guided tours to explore hidden gems of Ella.",
+      "images": ["https://example.com/images/guide1.jpg"],
+      "location": {
+        "address": {
+          "road": "Main Street",
+          "city": "Ella",
+          "postalCode": "90100"
+        },
+        "landmark": "Next to Ella Railway",
+        "googleBusiness": "https://g.page/ella-guide-tours"
+      },
+      "contact": {
+        "phone": 5550000,
+        "email": "guides@ellaexplore.com",
+        "website": "https://ellaexplore.com"
+      },
+      "reviewRating": 4.9
+    },
+    {
+      "id": "place_1325",
+      "type": "restaurant",
+      "name": "Seaside Diner",
+      "overview": "Fresh seafood by the beach with stunning sunset views.",
+      "images": ["https://example.com/images/dining2.jpg"],
+      "location": {
+        "address": {
+          "road": "Beachfront Lane",
+          "city": "Galle",
+          "postalCode": "80000"
+        },
+        "landmark": "Close to Lighthouse",
+        "googleBusiness": "https://g.page/seaside-diner"
+      },
+      "contact": {
+        "phone": 3344556,
+        "email": "reservations@seasidediner.com",
+        "website": "https://seasidediner.com"
+      },
+      "reviewRating": 4.6
+    }
+  ]
+}

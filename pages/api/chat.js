@@ -1,20 +1,28 @@
 import { OpenAI } from "openai";
 import { config } from "dotenv";
 import { system_prompt } from "./data/prompt";
+  // Make sure to import your auth config
 
-config(); // Load environment variables
+config();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 const assistantID = process.env.ASSISTANT;
-
-// Store threads in memory
 let threads = {};
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
+    const userTokenHeader = req.headers["x-user-token"];
+    const user = userTokenHeader ? JSON.parse(userTokenHeader) : null;
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: No user token founds" , req : req.headers});
+    }
+
     const { thread_id, message } = req.body;
 
     if (!assistantID) {
@@ -51,6 +59,11 @@ export default async function handler(req, res) {
         {
           assistant_id: assistantID,
           instructions: system_prompt("jhone"),
+          tools: [
+            {
+              type: "file_search",
+            },
+          ],
         }
       );
 
@@ -77,6 +90,7 @@ export default async function handler(req, res) {
           ? assistantMessage.content[0].text.value
           : "No response",
         thread_id: currentThreadId,
+        user,
       });
     } catch (error) {
       console.error("Error: ", error); // Log full error for debugging

@@ -27,8 +27,8 @@ const ChatMessages = ({ messages, isThinking, typingMessage, userImage }) => {
 
                     {/* Message Content */}
                     <div className={`rounded-lg p-4 max-w-[70%] ${msg.sender === 'user' ? 'bg-spice-red text-white' : 'bg-white border border-spice-red text-gray-800'}`}>
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}  >
-                            {typingMessage}
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} >
+                            {msg.text}
                         </ReactMarkdown>
 
 
