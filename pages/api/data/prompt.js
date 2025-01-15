@@ -76,117 +76,123 @@ const system_prompt = (data) => {
     `;
 };
 const travel_plan_prompt = (data) => {
-  // Define the budget options
-  const budgetOptions = [
-    "$ - Affordable options",
-    "$$ - Reasonable, sensibly priced",
-    "$$$ - Upscale experience",
-    "$$$$ - Luxury experience",
-  ];
-
-  // Get the budget description based on the selected budget value
-  const budgetDescription = budgetOptions[data.budgetValue - 1];
-
-  // Use join() to create a comma-separated string of selected vibes
-  const travelVibes = data.selectedVibes.join(", ");
-
-  return `
-   ### Travel Itinerary Generation Prompt
-   
-   **Objective:**  
-   Create a personalized day-by-day travel itinerary reflecting user preferences, budget, and trip specifics. Welcome tourists to Sri Lanka with a warm, friendly greeting highlighting the hospitality of Sri Lankan culture. Act as a travel guide, providing accurate and helpful travel-related assistance in Sri Lanka.
-   
-   ---
-   
-   ### User Data:
-   - **Destination:** ${data.destination} - (this user idea)
-   - **Trip Dates:** ${data.dateRange.startDate} to ${data.dateRange.endDate}  
-   - **Traveler Information:**  
-     - Adults: ${data.travelers.adults}  
-     - Children: ${data.travelers.children}  
-     - Infants: ${data.travelers.infants}  
-     - Pets: ${data.travelers.pets}  
-   - **Budget:** ${budgetDescription}  
-   - **Travel Vibe:** ${travelVibes}  
-   
-   ---
-   
-   ### Knowledge Areas:
-   - Popular tourist destinations in Sri Lanka
-   - Local customs and etiquette
-   - Transportation options
-   - Accommodation recommendations
-   - Local cuisine and restaurants
-   - Weather patterns and best times to visit
-   - Cultural and historical sites
-   - Safety tips for travelers
-   - Local events and festivals
-   - Currency and payment methods
-   
-   ---
-   
-   ### Itinerary Requirements:
-   - **Themed Days:** Each day should have a unique theme aligning with the travel vibe.
-   - **Detailed Daily Plan:**  
-     - **Morning:** Activities, recommended attractions, and transportation tips.  
-     - **Afternoon:** Sightseeing, lunch options, and local hotspots.  
-     - **Evening:** Dining recommendations, leisure activities, and night events.
-   - **Accommodations:** Suggest specific hotels matching the budget and traveler preferences.
-   - **Dining:** Recommendations considering dietary needs or preferences.
-   - **Local Experiences:** Unique attractions, hidden gems, and special events.
-   - **Rest Days:** Optional leisure days.
-   - **Travel Tips:** Transportation, safety, and local customs.
-   
-   ---
-   
-   ### Output Format (Markdown):
-   ### **Travel Itinerary for [name/location] - ([month year])**
-   \`\`\`
-   **Day X: [Title of the Day]**  
-   *Theme:* [Daily Theme]  
+   // Define the budget options
+   const budgetOptions = [
+     "$ - Affordable options",
+     "$$ - Reasonable, sensibly priced",
+     "$$$ - Upscale experience",
+     "$$$$ - Luxury experience",
+   ];
  
-   **Morning:**  
-   [Activity description, transportation details, and relevant tips]  
+   // Get the budget description based on the selected budget value
+   const budgetDescription = budgetOptions[data.budgetValue - 1];
  
-   **Afternoon:**  
-   [Activity description, lunch recommendations, and sightseeing options]  
+   // Use join() to create a comma-separated string of selected vibes
+   const travelVibes = data.selectedVibes.join(", ");
  
-   **Evening:**  
-   [Dinner spots, night activities, and leisure options]  
- 
-   **Tips:**  
-   [Relevant travel tips and insider insights for the day]  
-   \`\`\`
-   ---
-   
-   ### Example Output:
-   \`\`\`
-   **Day 1: Arrival and Island Welcome**  
-   *Theme:* Welcome to Paradise  
- 
-   **Morning:**  
-   - Flight Arrival: Arrive at Bandaranaike International Airport (CMB).  
-   - Private Transfer: Book a pet-friendly private ride to the hotel.  
-   - Accommodation: *Jetwing Beach* (Pet-friendly, beachfront).  
- 
-   **Afternoon:**  
-   - Check-in and relax.  
-   - Lunch at the hotel’s in-house restaurant featuring Sri Lankan cuisine.  
- 
-   **Evening:**  
-   - Enjoy a sunset beach walk.  
-   - Dinner at *Seafood Cove* – known for its fresh catch of the day.  
- 
-   **Tips:**  
-   - Keep pet documentation readily available during travel.  
-   - Confirm transfer services accommodate pets.
-   \`\`\`
-   
-   ---
-   
-   ### Key Notes:
-   - Structure content for readability incorporating line breaks for responsive design.
-   - Emphasize hospitality and user-friendly content in all interactions.
-   `;
-};
+   return `
+    ### Travel Itinerary Generation Prompt
+    
+    **Objective:**  
+    Create a personalized day-by-day travel itinerary reflecting user preferences, budget, and trip specifics. Welcome tourists to Sri Lanka with a warm, friendly greeting highlighting the hospitality of Sri Lankan culture. Act as a travel guide, providing accurate and helpful travel-related assistance in Sri Lanka.
+    
+    ---
+    
+    ### User Data:
+    - **Destination:** ${data.destination} - (this user idea)
+    - **Trip Dates:** ${data.dateRange.startDate} to ${data.dateRange.endDate}  
+    - **Traveler Information:**  
+      - Adults: ${data.travelers.adults}  
+      - Children: ${data.travelers.children}  
+      - Infants: ${data.travelers.infants}  
+      - Pets: ${data.travelers.pets}  
+    - **Budget:** ${budgetDescription}  
+    - **Travel Vibe:** ${travelVibes}  
+    
+    ---
+    
+    ### Knowledge Areas:
+    - Popular tourist destinations in Sri Lanka
+    - Local customs and etiquette
+    - Transportation options
+    - Accommodation recommendations
+    - Local cuisine and restaurants
+    - Weather patterns and best times to visit
+    - Cultural and historical sites
+    - Safety tips for travelers
+    - Local events and festivals
+    - Currency and payment methods
+    
+    ---
+    
+    ### Itinerary Requirements:
+    - **Strict Format:** Follow the exact output format below. Do not deviate.
+    - **Themed Days:** Each day must have a unique theme aligning with the travel vibe.
+    - **Detailed Daily Plan:**  
+      - **Morning:** Activities, recommended attractions, and transportation tips.  
+      - **Afternoon:** Sightseeing, lunch options, and local hotspots.  
+      - **Evening:** Dining recommendations, leisure activities, and night events.
+    - **Accommodations:** Suggest specific hotels matching the budget and traveler preferences.
+    - **Dining:** Recommendations considering dietary needs or preferences.
+    - **Local Experiences:** Unique attractions, hidden gems, and special events.
+    - **Rest Days:** Optional leisure days.
+    - **Travel Tips:** Transportation, safety, and local customs.
+    
+    ---
+    
+    ### Output Format (Strictly Follow This Structure):
+    ### **Travel Itinerary for [Destination] - ([Month Year])**
+    \`\`\`
+    **Day X: [Title of the Day]**  
+    *Theme:* [Daily Theme]  
+  
+    **Morning:**  
+    - [Activity 1]  
+    - [Activity 2]  
+    - [Transportation details]  
+  
+    **Afternoon:**  
+    - [Activity 1]  
+    - [Lunch recommendation]  
+    - [Sightseeing options]  
+  
+    **Evening:**  
+    - [Dinner spot]  
+    - [Night activity]  
+    - [Leisure options]  
+  
+    **Tips:**  
+    - [Tip 1]  
+    - [Tip 2]  
+    \`\`\`
+    ---
+    
+    ### Example Output:
+    \`\`\`
+    ### **Travel Itinerary for Colombo - (October 2023)**
+    
+    **Day 1: Arrival and Island Welcome**  
+    *Theme:* Welcome to Paradise  
+  
+    **Morning:**  
+    - Flight Arrival: Arrive at Bandaranaike International Airport (CMB).  
+    - Private Transfer: Book a pet-friendly private ride to the hotel.  
+    - Accommodation: *Jetwing Beach* (Pet-friendly, beachfront).  
+  
+    **Afternoon:**  
+    - Check-in and relax.  
+    - Lunch at the hotel’s in-house restaurant featuring Sri Lankan cuisine.  
+    - Visit Galle Face Green for a leisurely stroll.  
+  
+    **Evening:**  
+    - Dinner at *Seafood Cove* – known for its fresh catch of the day.  
+    - Enjoy a sunset beach walk.  
+    - Optional: Visit a local night market.  
+  
+    **Tips:**  
+    - Keep pet documentation readily available during travel.  
+    - Confirm transfer services accommodate pets.  
+    \`\`\`
+    `;
+ };
 export { system_prompt, travel_plan_prompt };

@@ -27,17 +27,17 @@ const parseItineraryToJSON = (itineraryText) => {
         new RegExp(`\\*\\*${section}:\\*\\*([\\s\\S]*?)(\\*\\*|$)`)
       );
       if (sectionMatch) {
-        dayData[section.toLowerCase()] = sectionMatch[1].trim();
+        // Clean up the section text (remove leading/trailing spaces and dashes)
+        dayData[section.toLowerCase()] = sectionMatch[1]
+          .trim()
+          .split("\n")
+          .map((line) => line.trim().replace(/^- /, "")) // Remove "- " from list items
+          .filter((line) => line !== ""); // Remove empty lines
       } else {
         // Default value for empty fields
-        dayData[section.toLowerCase()] = "-";
+        dayData[section.toLowerCase()] = [];
       }
     });
-
-    // Append "Use" to the tips field if it exists
-    if (dayData.tips && dayData.tips !== "-") {
-      dayData.tips = `Use ${dayData.tips}`;
-    }
 
     itinerary.push(dayData);
   });

@@ -176,6 +176,10 @@ export default async function handler(req, res) {
           thread: true, // Include thread details if needed
         },
       });
+      if (plans.length === 0) {
+         
+        return res.status(404).json({ message: "No Plans here" });
+      }
 
       // Return the plans as the response
       return res.status(200).json(plans);
