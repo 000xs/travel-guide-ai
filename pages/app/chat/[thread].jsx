@@ -42,7 +42,7 @@ const Chat = () => {
             setThreadId(chatId);
 
             getPlan(chatId).then((data) => {
-                setPlan(data[0]);
+                setPlan(data[0] || data);
                 setIsLoding(false);
             });
         } else {

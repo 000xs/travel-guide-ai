@@ -20,21 +20,21 @@ const parseItineraryToJSON = (itineraryText) => {
     const themeMatch = day.match(/\*Theme:\* (.*)/);
     dayData.theme = themeMatch ? themeMatch[1].trim() : "";
 
-    // Extract morning, afternoon, evening, and tips
+     
     const sections = ["Morning", "Afternoon", "Evening", "Tips"];
     sections.forEach((section) => {
       const sectionMatch = day.match(
         new RegExp(`\\*\\*${section}:\\*\\*([\\s\\S]*?)(\\*\\*|$)`)
       );
       if (sectionMatch) {
-        // Clean up the section text (remove leading/trailing spaces and dashes)
+        
         dayData[section.toLowerCase()] = sectionMatch[1]
           .trim()
           .split("\n")
-          .map((line) => line.trim().replace(/^- /, "")) // Remove "- " from list items
-          .filter((line) => line !== ""); // Remove empty lines
+          .map((line) => line.trim().replace(/^- /, ""))  
+          .filter((line) => line !== "");   
       } else {
-        // Default value for empty fields
+       
         dayData[section.toLowerCase()] = [];
       }
     });
@@ -42,7 +42,7 @@ const parseItineraryToJSON = (itineraryText) => {
     itinerary.push(dayData);
   });
 
-  // Return JSON with trip name and itinerary
+ 
   return JSON.stringify({ tripName, itinerary }, null, 2);
 };
 

@@ -37,9 +37,9 @@ const TripItineraryMap = ({ data }) => {
     const totalTravelers = (data.travelers?.adults || 0) + (data.travelers?.children || 0) + (data.travelers?.infants || 0);
 
     return (
-        <div className="w-full  mx-auto ">
+        <div className="w-full mx-auto">
             {/* Trip Header Card */}
-            <div className=" flex flex-col p-4 mb-4">
+            <div className="flex flex-col p-4 mb-4">
                 <h1 className="text-xl sm:text-2xl font-bold mb-2">{data.tripName || 'Trip Details'}</h1>
                 <div className="flex flex-col space-y-2 text-sm text-gray-600">
                     <div className="flex items-center gap-2">
@@ -78,11 +78,17 @@ const TripItineraryMap = ({ data }) => {
                                         <h3 className="text-sm font-medium capitalize">{slot}</h3>
                                     </div>
                                     <div className="text-sm text-gray-600 pl-6">
-                                        {(day[slot] || '').split('\n').map((item, i) => (
-                                            <div key={i} className="mb-1">
-                                                {item.replace(/[*\-]/g, '').trim()}
+                                        {Array.isArray(day[slot]) ? (
+                                            day[slot].map((item, i) => (
+                                                <div key={i} className="mb-1">
+                                                    {item.replace(/[*\-]/g, '').trim()}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="mb-1">
+                                                {day[slot] || 'No activities planned.'}
                                             </div>
-                                        ))}
+                                        )}
                                     </div>
                                 </div>
                             ))}
@@ -94,7 +100,17 @@ const TripItineraryMap = ({ data }) => {
                                     <Coffee className="w-4 h-4 mt-0.5 flex-shrink-0" />
                                     <div>
                                         <span className="font-medium">Tips: </span>
-                                        {day.tips.split('\n')[0].replace('Use -', '').trim()}
+                                        {Array.isArray(day.tips) ? (
+                                            day.tips.map((tip, i) => (
+                                                <div key={i} className="mb-1">
+                                                    {tip.replace('Use -', '').trim()}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div>
+                                                {day.tips.replace('Use -', '').trim()}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

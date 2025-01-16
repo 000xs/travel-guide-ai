@@ -27,11 +27,15 @@ const Chat = () => {
         if (savedThreadId) {
             setThreadId(savedThreadId);
         }
-        getPlans().then((data) => {
-            setPlan(data);
-            setIsLoding(false);
-        })
-    }, []);
+
+        if (status === "authenticated" && !isLoding) {
+            getPlans().then((data) => {
+                setPlan(data);
+                setIsLoding(false);
+            });
+        }
+    }, [status]);  
+
 
     async function getPlans() {
         try {
@@ -116,6 +120,9 @@ const Chat = () => {
         );
     }
 
+     
+
+
     return (
         <div className="h-screen flex bg-gray-50">
             <LeftNav />
@@ -147,8 +154,8 @@ const Chat = () => {
                                     <div className="py-1">
                                         {plans.map((plan) => (
                                             <Link key={plan.id}
-                                            className='flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-                                            href={`/app/chat/${plan.thread.id}`}> {plan.tripName}</Link>
+                                                className='flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+                                                href={`/app/chat/${plan.thread.id}`}> {plan.tripName}</Link>
 
                                             // <div key={plan.id} className="flex items-center space-x-2 p-2">
                                             //     <ArrowLeftRight className="w-5 h-5" />
