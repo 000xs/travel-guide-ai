@@ -6,17 +6,13 @@ import Head from 'next/head';
 import Link from 'next/link';
 import LeftNav from '@/Components/LeftNav';
 import ChatMessages from '@/Components/ChatMessage';
-
 import { useRouter } from 'next/router';
-
 import TripForm from '@/Components/ui/forms/TripForm';
 import { travel_plan_prompt } from '@/pages/api/data/prompt';
 import { itineraryTextToJson, parseItineraryToJSON } from '@/utils/parseItinerary';
 import { chatAPI, planAPI } from '@/utils/api-client';
 import TripItineraryMap from '@/Components/ui/TripItineraryMap';
 import ChatTopNav from '@/Components/ui/ChatTopNav';
-
-
 
 const Chat = () => {
     const router = useRouter();
@@ -28,7 +24,6 @@ const Chat = () => {
     const [threadId, setThreadId] = useState(null);
     const [typingMessage, setTypingMessage] = useState('');
     const [isThinking, setIsThinking] = useState(false);
-
     const [isLoding, setIsLoding] = useState(false);
     const [plan, setPlan] = useState(null);
 
@@ -40,19 +35,18 @@ const Chat = () => {
         }
         if (chatId && chatId !== "new") {
             setThreadId(chatId);
-
             getPlan(chatId).then((data) => {
                 setPlan(data[0] || data);
-                setIsLoding(false);
+                setIsLoding(false); // Reset loading state after data is fetched
             });
         } else {
-            setIsLoding(false);
+            setIsLoding(false); // Ensure loading state is reset if no chatId
         }
     }, [chatId, session]);
 
     async function getPlan(id) {
         try {
-            setIsLoding(true)
+            setIsLoding(true);
             const res = await planAPI.getPlanById(id);
             console.log("Plan data:", res.data);
             if (res.status === 200) {
@@ -61,30 +55,25 @@ const Chat = () => {
                 console.error("Failed to fetch plan:", res.data);
                 router.push("/app/chat");
             }
-
-
         } catch (error) {
             console.error("Error fetching plan:", error);
-
             return error;
+        } finally {
+            setIsLoding(false); // Reset loading state
         }
     }
 
     const [formData, setFormData] = useState({});
     const formOnSubmit = async (data) => {
-        setFormData(data)
-
+        setFormData(data);
         setIsThinking(true);
 
         const newMessage = { text: travel_plan_prompt(data), sender: 'user' };
         setMessages([...messages, newMessage]);
         setInput('');
 
-
         try {
-
             const response = await chatAPI.sendMessage(travel_plan_prompt(data), threadId);
-            console.log(session)
             setIsThinking(false);
 
             const budgetOptions = [
@@ -94,11 +83,9 @@ const Chat = () => {
                 "$$$$ - Luxury experience",
             ];
 
-            // Get the budget description based on the selected budget value
             const budgetDescription = budgetOptions[data.budgetValue - 1];
             const travelVibes = data.selectedVibes.join(", ");
 
-            //createplan
             const planData = {
                 prompt: response.data.response,
                 startDate: new Date(data.dateRange.startDate),
@@ -106,39 +93,31 @@ const Chat = () => {
                 budget: budgetDescription,
                 travelers: { adults: data.travelers.adults, children: data.travelers.children, infants: data.travelers.infants, pets: data.travelers.pets },
                 selectedViber: data.selectedVibes,
+            };
 
-            }
-            const responsePlan = await planAPI.createPlan(planData)
-            setIsLoding(true)
+            const responsePlan = await planAPI.createPlan(planData);
+            setIsLoding(true);
 
             if (responsePlan.data.thread) {
                 setIsThinking(false);
-                simulateTyping(response.data.response)
+                simulateTyping(response.data.response);
                 router.replace(`/app/chat/${responsePlan.data.thread.id}`);
                 localStorage.setItem("a_thread_id", responsePlan.data.thread.id);
             } else {
                 console.error("Failed to create plan:", responsePlan.data);
-
             }
-            console.log(responsePlan.data)
-
-
-                ;
         } catch (error) {
             setMessages(prev => [...prev, {
                 text: 'Error: ' + error.message,
                 sender: 'error'
             }]);
             setIsThinking(false);
+        } finally {
+            setIsLoding(false); // Reset loading state
         }
-
-    }
-
-
-
+    };
 
     const Aside = ({ chat }) => (
-
         <aside className="hidden lg:block w-[40%] border-l bg-white px-6 py-3 overflow-y-auto">
             {chat === 'new' ? (
                 <TripForm onFormSubmit={formOnSubmit} />
@@ -149,11 +128,8 @@ const Chat = () => {
                     )}
                 </div>
             )}
-
-
         </aside>
     );
-
 
     const sendMessage = async () => {
         if (!input.trim()) return;
@@ -165,15 +141,8 @@ const Chat = () => {
 
         try {
             const response = await chatAPI.sendMessage(input, threadId);
-
-
             setIsThinking(false);
-            console.log(session)
-            console.log(response.data)
-
-
             simulateTyping(response.data.response);
-
         } catch (error) {
             setMessages(prev => [...prev, {
                 text: 'Error: ' + error.message,
@@ -202,8 +171,7 @@ const Chat = () => {
         }, 1);
     };
 
-
-    if (status === "loading" || isLoding) {
+    if (status === "loading"  ) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-red-500" />
@@ -228,12 +196,8 @@ const Chat = () => {
     return (
         <div className="h-screen flex bg-gray-50">
             <LeftNav />
-
-
-
             <div className="flex-1 flex flex-col">
                 {plan && (<ChatTopNav chats={plan.tripName} />)}
-
                 <main className="flex-1 flex overflow-hidden bg-white">
                     <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full">
                         <div className="flex-1 overflow-y-auto px-6 py-4">
@@ -244,22 +208,19 @@ const Chat = () => {
                                 userImage={session.user?.image}
                             />
                         </div>
-
-
-                        <div className="p-4   bg-white">
+                        <div className="p-4 bg-white">
                             {isThinking && (
                                 <div className='w-full px-1 py-2 font-body2 font-semibold'>
                                     bot is thinking...
                                 </div>
                             )}
                             <div className="flex items-center bg-white border border-gray-300 rounded-xl shadow-md px-8 py-4">
-
                                 <textarea
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && !isThinking && sendMessage()}
                                     placeholder="Send a message..."
-                                    className="flex-1 bg-transparent focus:outline-none text-lg text-gray-700 placeholder-gray-400 resize-none h-12 overflow-hidden  "
+                                    className="flex-1 bg-transparent focus:outline-none text-lg text-gray-700 placeholder-gray-400 resize-none h-12 overflow-hidden"
                                 />
                                 <button
                                     onClick={sendMessage}
@@ -272,8 +233,6 @@ const Chat = () => {
                             </div>
                         </div>
                     </div>
-                    {/* <TripForm chat={chatId} /> */}
-
                     <Aside chat={chatId} />
                 </main>
             </div>
@@ -282,4 +241,3 @@ const Chat = () => {
 };
 
 export default Chat;
-
