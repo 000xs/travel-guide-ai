@@ -1,8 +1,7 @@
 const parseItineraryToJSON = (itineraryText) => {
   const days = itineraryText.split("**Day ").slice(1); // Split by days
   const itinerary = [];
-
-  // Extract trip name from the itinerary text
+ 
   const tripNameMatch = itineraryText.match(
     /### \*\*Travel Itinerary for (.*?)\*\*/
   );
